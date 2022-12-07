@@ -1,0 +1,19 @@
+{
+  "name": "pdp-1-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon ./server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HeibaiL/pdp-1-server.git"
+  },
+  "author": "VD",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HeibaiL/pdp-1-server/issues"
+  },
+  "homepage": "https://github.com/HeibaiL/pdp-1-server#readme"
+}
