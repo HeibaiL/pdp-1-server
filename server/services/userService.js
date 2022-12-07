@@ -76,9 +76,8 @@ class UserService {
          */
        const url = await res.text();
        const params = new URLSearchParams(url)
-        const token = params.get("access_token")
-       const user = await this.getGitHubUserData(token);
-       return JSON.parse(user)
+
+       return params.get("access_token")
 
 
         // { token_type, access_token, error, error_description }
@@ -86,16 +85,18 @@ class UserService {
         // return parsedData.access_token;
     };
 
-    async getGitHubUserData(access_token) {
+    async getGitHubUserData(code) {
+       const token = await this.getAccessTokenFromCode(code)
         const res = await fetch('https://api.github.com/user',{
             headers: {
-                Authorization: `token ${access_token}`,
+                Authorization: `token ${token}`,
             } }
         );
-        // { id, email, name, login, avatar_url }
-        return res.text();
-
+        const jsonData = await res.text();
+        const userData = JSON.parse(jsonData)
+        return {...userData, picture: userData.avatar_url}
     };
+
     async getProfileByRefreshToken(refresh){
         const token = refresh.split(' ')[1];
         if(!token){
