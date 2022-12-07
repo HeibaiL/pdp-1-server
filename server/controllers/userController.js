@@ -65,7 +65,6 @@ class UserController {
         const {code} = req.body;
         try {
             const data = await userService.getGitHubUserData(code);
-            console.log(data)
 
             const user = await userService.findOne({login: data.login})
             let userData;

@@ -6,9 +6,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const router = require('./router');
 const exceptionsMiddleware = require('./middlewares/exceptionsMiddleware');
-
-
 const app = express();
+require('express-ws')(app);
+
 
 const port = process.env.PORT || 3004;
 
@@ -20,6 +20,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser('secret key'))
 app.use('/api/', router)
 
+app.ws('/', function(ws, req) {
+    ws.on('message', function(msg) {
+        console.log(JSON.parse(msg))
+    });
+    console.log('socket', req.testing);
+});
 app.use(exceptionsMiddleware)
 
 mongoose.connect(process.env.DB_URL).then(() => console.log('DB CONNECTED')).catch(err => console.log(err))

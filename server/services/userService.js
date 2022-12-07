@@ -104,7 +104,7 @@ class UserService {
         }
 
         const validatedTokenData = tokenService.validateToken(token);
-        console.log(validatedTokenData)
+
         if(!validatedTokenData){
             return next(ApiError.UnauthorizedError())
         }
