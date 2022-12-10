@@ -29,6 +29,12 @@ class TokenService {
     async removeRefreshToken(refreshToken){
          return Token.findOneAndDelete({refreshToken})
     }
+    async findOne(refreshToken){
+        const tokenData = await Token.findOne({refreshToken: refreshToken});
+        return tokenData
+    }
+
+
 
 }
 

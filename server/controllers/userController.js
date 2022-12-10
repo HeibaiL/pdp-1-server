@@ -26,12 +26,25 @@ class UserController {
     }
 
     async logoutUser(req, res) {
-        const {refreshToken} = req.cookies;
+        const {refreshToken} = req.body;
         const user = await userService.logoutUser(refreshToken);
         res.clearCookie("refreshToken");
         return res.send(user);
     }
 
+    async refresh(req, res, next){
+        const {refreshToken} = req.body;
+        try{
+            if(refreshToken){
+                const userData = await userService.refresh(refreshToken);
+                res.cookie('refreshToken', userData.refreshToken, {httpOnly: false, maxAge: 30 * 24 * 60 * 1000})
+                return res.json(userData);
+            }
+        }catch(ex){
+            next(ex)
+        }
+
+    }
     async fbLogin(req, res, next) {
         const data = req.body;
         try {
@@ -86,8 +99,18 @@ class UserController {
         if(!authHeader){
            return  res.json(null)
         }
-        const user = await userService.getProfileByRefreshToken(authHeader)
-        res.json(user)
+
+        const tokenValid = await tokenService.validateToken(authHeader.split(" ")[1]);
+        if(tokenValid){
+            const user = await userService.getProfileByToken(authHeader)
+            if(user) {
+                res.json(user)
+            }
+        }else{
+            next(new Error("error"))
+        }
+
+
     }
 
 }

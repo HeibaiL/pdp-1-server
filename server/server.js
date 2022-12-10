@@ -9,8 +9,10 @@ const exceptionsMiddleware = require('./middlewares/exceptionsMiddleware');
 const app = express();
 require('express-ws')(app);
 
+const websocket = require('./websocket/Websocket')
 
 const port = process.env.PORT || 3004;
+app.use(cookieParser('refreshToken'))
 
 app.use(cors())
 
@@ -20,11 +22,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser('secret key'))
 app.use('/api/', router)
 
+
 app.ws('/', function(ws, req) {
-    ws.on('message', function(msg) {
-        console.log(JSON.parse(msg))
-    });
-    console.log('socket', req.testing);
+    const params = new URLSearchParams(req.url.split("?")[1]);
+    const userToken = params.get("userToken")
+    websocket.addConnection(ws)
+    ws.on('message', websocket.onMessage(ws));
 });
 app.use(exceptionsMiddleware)
 

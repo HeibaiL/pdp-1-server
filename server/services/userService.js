@@ -55,6 +55,23 @@ class UserService {
         return User.findOne({id: tokenData.userId});
     }
 
+    async refresh(refreshToken){
+        if(!refreshToken){
+            throw ApiError.UnauthorizedError()
+        }
+        const userData = await tokenService.validateToken(refreshToken)
+        const tokenFromDb = await tokenService.findOne(refreshToken)
+
+        if(!userData || !tokenFromDb){
+            // throw ApiError.UnauthorizedError()
+        }
+        const user = await User.findOne({login: userData.login})
+        const tokens =  tokenService.generateTokens(user);
+        await tokenService.saveRefreshToken(user._id, tokens.refreshToken)
+        return {user, ...tokens}
+
+    }
+
     async googleAuth(token){
         const ticket = await client.verifyIdToken({
             idToken: token,
@@ -97,17 +114,12 @@ class UserService {
         return {...userData, picture: userData.avatar_url}
     };
 
-    async getProfileByRefreshToken(refresh){
-        const token = refresh.split(' ')[1];
+    async getProfileByToken(t){
+        const token = t.split(' ')[1];
         if(!token){
             return null;
         }
-
         const validatedTokenData = tokenService.validateToken(token);
-
-        if(!validatedTokenData){
-            return next(ApiError.UnauthorizedError())
-        }
 
         const user = await User.findOne({login: validatedTokenData.login})
         return user
@@ -116,6 +128,7 @@ class UserService {
     async findOne(data){
         return  User.findOne({...data})
     }
+
 }
 
 module.exports = new UserService();

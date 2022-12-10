@@ -11,10 +11,11 @@ const authMiddleware = require('./middlewares/authMiddleware')
 router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
 router.post('/fbLogin', userController.fbLogin);
-router.get('/logout', userController.logoutUser);
+router.post('/logout', userController.logoutUser);
 router.post('/google-auth', userController.googleLogin)
 router.post('/github-auth', userController.githubLogin)
-router.get('/profile/me', userController.getProfile)
+router.post('/refresh', userController.refresh)
+router.get('/profile/me',authMiddleware, userController.getProfile)
 
 
 router.get('/data', authMiddleware, dataService.getData);
