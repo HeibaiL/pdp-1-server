@@ -1,13 +1,28 @@
 require('dotenv').config();
+
 const express = require('express');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const router = require('./router');
-const exceptionsMiddleware = require('./middlewares/exceptionsMiddleware');
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+const bodyParser = require('body-parser');
+
+const cookieParser = require('cookie-parser');
+
+const cors = require('cors');
+
+const mongoose = require('mongoose');
+
+const router = require('./router');
+
+const exceptionsMiddleware = require('./middlewares/exceptionsMiddleware');
+
+
 require('express-ws')(app);
+
+
 
 const websocket = require('./websocket/Websocket')
 
@@ -29,7 +44,14 @@ app.ws('/', function(ws, req) {
     websocket.addConnection(ws)
     ws.on('message', websocket.onMessage(ws));
 });
+
+
 app.use(exceptionsMiddleware)
+
+/** Create socket connection */
+
+
+io.on('connection', websocket.connection)
 
 mongoose.connect(process.env.DB_URL).then(() => console.log('DB CONNECTED')).catch(err => console.log(err))
 
